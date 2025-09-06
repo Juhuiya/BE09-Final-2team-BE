@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: microservices-config
+data:
+  # Spring Boot 공통 설정
+  SPRING_PROFILES_ACTIVE: "dev"
+  
+  # Eureka 설정
+  EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: "http://discovery-service:8761/eureka"
+  EUREKA_CLIENT_REGISTER_WITH_EUREKA: "true"
+  EUREKA_CLIENT_FETCH_REGISTRY: "true"
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+  
+  # Database 설정 (외부 공통 DB)
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql.macacolabs.site:3322/momnectdb"
+  SPRING_DATASOURCE_USERNAME: "momnect"
+  SPRING_DATASOURCE_PASSWORD: "momnect"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "com.mysql.cj.jdbc.Driver"
+  
+  # JPA 설정
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_JPA_SHOW_SQL: "true"
+  SPRING_JPA_DATABASE_PLATFORM: "org.hibernate.dialect.MySQL8Dialect"
+  
+  # Redis 설정 (Chat, WebSocket 서비스용)
+  SPRING_REDIS_HOST: "redis-service"
+  SPRING_REDIS_PORT: "6379"
+  
+  # MongoDB 설정 (Chat 서비스용)
+  SPRING_DATA_MONGODB_URI: "mongodb://dev.macacolabs.site:5501/chatdb"
+  
+  # Elasticsearch 설정 (Product 서비스용)
+  SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+  
+  # Logging 설정
+  LOGGING_LEVEL_COM_EXAMPLE: "DEBUG"
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: "INFO"
+
+    # FTP 서버 설정 (상품, 파일 서비스용)
+  FTP_FILE_SERVER_URL: "http://dev.macacolabs.site:8008"

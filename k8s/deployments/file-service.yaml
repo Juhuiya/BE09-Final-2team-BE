@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service
+  labels:
+    app: file-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+      - name: file-service
+        image: juhuiya/file-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: app-config
+        env:
+        - name: FTP_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: ftp-secret
+              key: ftp.server
+        - name: FTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: ftp-secret
+              key: ftp.port
+        - name: FTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: ftp-secret
+              key: ftp.user
+        - name: FTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ftp-secret
+              key: ftp.password
+        - name: FTP_PATH
+          valueFrom:
+            secretKeyRef:
+              name: ftp-secret
+              key: ftp.path
+        - name: SERVER_PORT
+          value: "8080"
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 130
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 150
+          timeoutSeconds: 5
+          periodSeconds: 30
+          failureThreshold: 3

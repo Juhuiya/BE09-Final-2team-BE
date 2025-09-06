@@ -1,34 +1,48 @@
 server:
-  port: 0
+  port: 8080  # 0에서 8080으로 고정
   forward-headers-strategy: framework
 
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  application:
+    name: chat-service
+
+  # 데이터베이스 설정
+  datasource:
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: ${SPRING_JPA_DATABASE_PLATFORM}
+
+  # MongoDB 설정
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+    # Redis 설정 제거 (사용하지 않는다고 하셨으므로)
+    # redis:
+    #   host: redis-service
+    #   port: 6379
+
+# Eureka 설정
 eureka:
   instance:
-    hostname: localhost
+    hostname: chat-service
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
-
-spring:
-  profiles:
-    active: dev
-  application:
-    name: chat-service
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      timeout: 2000ms
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
 
 # Feign Client 설정
 feign:
@@ -38,17 +52,18 @@ feign:
         connectTimeout: 5000
         readTimeout: 5000
       user-service:
-        url: http://localhost:8000/api/v1/user-service
+        url: http://user-service:8080/api/v1/user-service
 
-logging:
-  level:
-    com.momnect.chatservice: INFO
-    org.springframework.web: INFO
-    org.springframework.security: DEBUG
-    com.momnect.chatservice.command.client: DEBUG
-
-# swagger
+# Swagger 설정
 springdoc:
   packages-to-scan: com.momnect.chatservice
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
+
+# 로깅 설정
+logging:
+  level:
+    com.momnect.chatservice: ${LOGGING_LEVEL_COM_EXAMPLE:INFO}
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+    com.momnect.chatservice.command.client: DEBUG

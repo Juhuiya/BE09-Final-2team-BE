@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service
+  labels:
+    app: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+      - name: gateway-service
+        image: juhuiya/gateway-service:latest  # Docker Hub 이미지로 변경
+        imagePullPolicy: Always  # 일관성을 위해 Always로 변경
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: app-config  # ConfigMap 사용으로 통일
+        env:
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: jwt-secret
+              key: jwt.secret.key  # JWT Secret 추가
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 90  # Gateway는 모든 서비스 정보가 필요하므로 좀 더 길게
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3

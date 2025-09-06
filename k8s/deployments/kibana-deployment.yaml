@@ -1,0 +1,35 @@
+# Kibana Pod를 배포하는 Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        # 7.17.10 버전으로 변경
+        image: kibana:7.17.10
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5601
+        env:
+          # Kibana가 Elasticsearch에 연결하도록 설정
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200"
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"

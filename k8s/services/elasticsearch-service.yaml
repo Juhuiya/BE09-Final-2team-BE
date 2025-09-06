@@ -1,0 +1,20 @@
+# Elasticsearch Pod로 트래픽을 라우팅하는 Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+  - protocol: TCP
+    port: 9200
+    targetPort: 9200
+    name: http
+  - protocol: TCP
+    port: 9300
+    targetPort: 9300
+    name: transport
+  type: ClusterIP
